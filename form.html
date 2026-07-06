@@ -218,6 +218,17 @@
           <label><input type="radio" name="lamp_type" value="Other"> Other</label>
         </div>
       </div>
+      <div class="field">
+     <label>Wattage <span class="req">*</span></label>
+    <div class="radio-group">
+    <label><input type="radio" name="wattage" value="30W"> 30W</label>
+    <label><input type="radio" name="wattage" value="40W"> 40W</label>
+    <label><input type="radio" name="wattage" value="50W"> 50W</label>
+    <label><input type="radio" name="wattage" value="100W"> 100W</label>
+    <label><input type="radio" name="wattage" value="150W"> 150W</label>
+    <label><input type="radio" name="wattage" value="Other"> Other</label>
+    </div>
+    </div>
 
       <div class="field">
         <label>Control Box <span class="req">*</span></label>
@@ -291,6 +302,7 @@ function validate() {
   if (!document.querySelector('input[name="ownership"]:checked')) errors.push("Ownership");
   if (!document.querySelector('input[name="lamp_type"]:checked')) errors.push("Lamp Type");
   if (!document.querySelector('input[name="control"]:checked'))   errors.push("Control Box");
+  if (!document.querySelector('input[name="wattage"]:checked')) errors.push("Wattage");
   return errors;
 }
 
@@ -309,6 +321,7 @@ function submitForm() {
     lng:       capturedLng,
     pole:      getRadio("pole"),
     ownership: getRadio("ownership"),
+    wattage: getRadio("wattage"),
     lamp:      getRadio("lamp_type"),
     control:   getRadio("control"),
     mapslink:  mapsUrl
