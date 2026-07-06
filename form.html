@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JMC Lamp Post Survey Form</title>
+<style>
+  :root {
+    --blue-dark: #0C2D5A;
+    --blue-mid:  #1A5276;
+    --blue-light:#2E86C1;
+    --gold:      #D4A017;
+    --bg:        #F4F7FB;
+    --surface:   #FFFFFF;
+    --border:    #DDE3ED;
+    --text:      #1A2535;
+    --muted:     #5A6A7E;
+    --radius:    8px;
+    --working:   #1E8449;
+    --notwork:   #C0392B;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header {
+    background: var(--blue-dark);
+    padding: 0 1.5rem;
+    display: flex; align-items: center; gap: 12px;
+    height: 60px; border-bottom: 3px solid var(--gold);
+  }
+  .header-logo {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--gold); display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 14px; color: var(--blue-dark); flex-shrink: 0;
+  }
+  header h1 { font-size: 15px; font-weight: 600; color: #FFF; }
+  header p  { font-size: 11px; color: #A8BDD4; }
+
+  .form-wrap { max-width: 600px; margin: 1.5rem auto; padding: 0 1rem 3rem; }
+
+  .section-card {
+    background: var(--surface); border: 0.5px solid var(--border);
+    border-radius: 10px; padding: 1.25rem; margin-bottom: 1rem;
+  }
+  .section-title {
+    font-size: 13px; font-weight: 600; color: var(--blue-dark);
+    border-left: 3px solid var(--gold); padding-left: 8px;
+    margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.4px;
+  }
+
+  .field { margin-bottom: 1rem; }
+  .field:last-child { margin-bottom: 0; }
+  label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
+  .req { color: #C0392B; margin-left: 2px; }
+
+  input[type=text], input[type=number], select, textarea {
+    width: 100%; padding: 9px 12px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    font-size: 14px; color: var(--text); background: var(--surface);
+    transition: border-color 0.15s;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--blue-light);
+    box-shadow: 0 0 0 3px rgba(46,134,193,0.12);
+  }
+  textarea { resize: vertical; min-height: 70px; }
+
+  /* GPS Box */
+  .gps-box {
+    background: #F0F7FF; border: 1px solid #B8D4F0;
+    border-radius: var(--radius); padding: 12px;
+  }
+  .gps-btn {
+    width: 100%; padding: 11px;
+    background: var(--blue-dark); color: #FFF;
+    border: none; border-radius: var(--radius);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.15s;
+  }
+  .gps-btn:hover { background: var(--blue-mid); }
+  .gps-btn:disabled { background: #888; cursor: not-allowed; }
+  .gps-status {
+    margin-top: 10px; padding: 8px 12px;
+    border-radius: var(--radius); font-size: 13px; display: none;
+  }
+  .gps-status.success { background: #D5F5E3; color: #1E8449; display: block; }
+  .gps-status.error   { background: #FADBD8; color: #C0392B; display: block; }
+  .gps-status.loading { background: #FEF9E7; color: #7D6608; display: block; }
+  .gps-coords {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;
+  }
+  .gps-coords input { background: #E8F4FD; font-size: 13px; font-family: monospace; }
+  .maps-link {
+    display: none; margin-top: 8px; font-size: 12px;
+    color: var(--blue-light); text-decoration: none; font-weight: 600;
+  }
+  .maps-link:hover { text-decoration: underline; }
+
+  /* Radio / Checkbox style */
+  .radio-group, .check-group {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
+  }
+  .radio-group label, .check-group label {
+    display: flex; align-items: center; gap: 6px;
+    padding: 6px 12px; border: 1px solid var(--border);
+    border-radius: 20px; cursor: pointer; font-size: 13px;
+    color: var(--text); text-transform: none; letter-spacing: 0;
+    font-weight: 400; transition: all 0.15s;
+  }
+  .radio-group input, .check-group input { display: none; }
+  .radio-group label:has(input:checked),
+  .check-group label:has(input:checked) {
+    background: var(--blue-dark); color: #FFF; border-color: var(--blue-dark);
+  }
+
+  /* Status special colors */
+  .status-working:has(input:checked)  { background: #1E8449 !important; border-color: #1E8449 !important; }
+  .status-notwork:has(input:checked)  { background: #C0392B !important; border-color: #C0392B !important; }
+  .status-maint:has(input:checked)    { background: #D68910 !important; border-color: #D68910 !important; }
+
+  /* Photo preview */
+  .photo-wrap { position: relative; }
+  .photo-input {
+    width: 100%; padding: 9px 12px;
+    border: 1px dashed var(--border); border-radius: var(--radius);
+    font-size: 14px; color: var(--muted); cursor: pointer;
+    background: #FAFBFC;
+  }
+  #photo-preview {
+    display: none; margin-top: 8px; border-radius: var(--radius);
+    max-height: 160px; width: 100%; object-fit: cover;
+    border: 1px solid var(--border);
+  }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%; padding: 14px;
+    background: var(--gold); color: var(--blue-dark);
+    border: none; border-radius: var(--radius);
+    font-size: 16px; font-weight: 700; cursor: pointer;
+    letter-spacing: 0.3px; transition: background 0.15s;
+    margin-top: 0.5rem;
+  }
+  .submit-btn:hover { background: #C49010; }
+  .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+  /* Success screen */
+  #success-screen {
+    display: none; text-align: center;
+    background: var(--surface); border: 0.5px solid var(--border);
+    border-radius: 10px; padding: 2.5rem 1.5rem; margin-bottom: 1rem;
+  }
+  .success-icon { font-size: 48px; margin-bottom: 12px; }
+  .success-title { font-size: 20px; font-weight: 700; color: var(--working); margin-bottom: 8px; }
+  .success-id { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .btn-new {
+    padding: 10px 24px; background: var(--blue-dark); color: #FFF;
+    border: none; border-radius: var(--radius); font-size: 14px;
+    font-weight: 600; cursor: pointer;
+  }
+
+  /* Submitting overlay */
+  #submitting {
+    display: none; position: fixed; inset: 0;
+    background: rgba(12,45,90,0.7); z-index: 999;
+    align-items: center; justify-content: center; flex-direction: column; color: #FFF;
+  }
+  .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-logo">JMC</div>
+  <div>
+    <h1>Lamp Post Survey Form</h1>
+    <p>Jaffna Municipal Council — Field Data Collection</p>
+  </div>
+</header>
+
+<!-- Submitting overlay -->
+<div id="submitting" style="display:none; position:fixed; inset:0; background:rgba(12,45,90,0.7); z-index:999; align-items:center; justify-content:center; flex-direction:column; color:#FFF;">
+  <div class="spinner"></div>
+  <div style="font-size:15px; font-weight:600;">Submitting data...</div>
+</div>
+
+<div class="form-wrap">
+
+  <!-- Success Screen -->
+  <div id="success-screen">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Successfully Submitted!</div>
+    <div class="success-id" id="success-msg">Data has been saved to JMC database.</div>
+    <button class="btn-new" onclick="resetForm()">Add Another Lamp Post</button>
+  </div>
+
+  <!-- FORM -->
+  <div id="main-form">
+
+    <!-- Section 1: Asset ID -->
+    <div class="section-card">
+      <div class="section-title">📋 Asset Identification</div>
+
+      <div class="field">
+        <label>Ward Number <span class="req">*</span></label>
+        <select id="ward" required>
+          <option value="">Select Ward</option>
+          <option>Ward 1</option><option>Ward 2</option><option>Ward 3</option>
+          <option>Ward 4 — Nallur Irajathani</option><option>Ward 5</option>
+          <option>Ward 6</option><option>Ward 7</option><option>Ward 8</option>
+          <option>Ward 9</option><option>Ward 10</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Street Name <span class="req">*</span></label>
+        <input type="text" id="street" placeholder="e.g. Nallur Road" required>
+      </div>
+
+      <div class="field">
+        <label>Assessment Number</label>
+        <input type="text" id="assess" placeholder="e.g. A-1042 (if available)">
+      </div>
+    </div>
+
+    <!-- Section 2: GPS Location -->
+    <div class="section-card">
+      <div class="section-title">📍 GPS Location</div>
+      <div class="gps-box">
+        <button class="gps-btn" id="gps-btn" onclick="getLocation()">
+          📡 Capture My Current Location
+        </button>
+        <div class="gps-status" id="gps-status"></div>
+        <div class="gps-coords">
+          <div>
+            <label style="margin-bottom:4px;">Latitude</label>
+            <input type="text" id="lat" placeholder="9.6615" readonly>
+          </div>
+          <div>
+            <label style="margin-bottom:4px;">Longitude</label>
+            <input type="text" id="lng" placeholder="80.0255" readonly>
+          </div>
+        </div>
+        <a id="maps-link" class="maps-link" target="_blank">🗺️ Verify on Google Maps</a>
+      </div>
+    </div>
+
+    <!-- Section 3: Physical Attributes -->
+    <div class="section-card">
+      <div class="section-title">🔩 Physical Attributes</div>
+
+      <div class="field">
+        <label>Pole Type <span class="req">*</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="pole" value="Concrete"> Concrete</label>
+          <label><input type="radio" name="pole" value="Steel"> Steel</label>
+          <label><input type="radio" name="pole" value="Other"> Other</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Ownership <span class="req">*</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="ownership" value="CEB"> CEB</label>
+          <label><input type="radio" name="ownership" value="MC"> MC</label>
+          <label><input type="radio" name="ownership" value="Other"> Other</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Lamp Type <span class="req">*</span></label>
+        <div class="radio-group">
+          <label><input type="radio" name="lamp" value="LED"> LED</label>
+          <label><input type="radio" name="lamp" value="COB"> COB</label>
+          <label><input type="radio" name="lamp" value="Tube Light"> Tube Light</label>
+          <label><input type="radio" name="lamp" value="Other"> Other</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Wattage <span class="req">*</span></label>
+        <select id="wattage" required>
+          <option value="">Select Wattage</option>
+          <option>30W</option><option>40W</option><option>50W</option>
+          <option>100W</option><option>150W</option><option>Other</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Control Box</label>
+        <div class="radio-group">
+          <label><input type="radio" name="control" value="Photocell"> Photocell</label>
+          <label><input type="radio" name="control" value="Breaker"> Breaker</label>
+          <label><input type="radio" name="control" value="Switch"> Switch</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Power Supply</label>
+        <div class="radio-group">
+          <label><input type="radio" name="power" value="CEB"> CEB</label>
+          <label><input type="radio" name="power" value="JMC"> JMC</label>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Meter Number</label>
+        <input type="text" id="meter" placeholder="e.g. M-5042">
+      </div>
+    </div>
+
+    <!-- Section 4: Status -->
+    <div class="section-card">
+      <div class="section-title">🔆 Operational Status</div>
+      <div class="field">
+        <label>Current Status <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="status-working"><input type="radio" name="status" value="Working"> ✅ Working</label>
+          <label class="status-notwork"><input type="radio" name="status" value="Not Working"> ❌ Not Working</label>
+          <label class="status-maint"><input type="radio" name="status" value="Under Maintenance"> 🔧 Under Maintenance</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Section 5: Photo & Remarks -->
+    <div class="section-card">
+      <div class="section-title">📸 Documentation</div>
+
+      <div class="field">
+        <label>Lamp Post Photo <span class="req">*</span></label>
+        <input type="file" id="photo" accept="image/*" capture="environment" class="photo-input" onchange="previewPhoto(this)">
+        <img id="photo-preview" alt="Photo preview">
+      </div>
+
+      <div class="field">
+        <label>Remarks</label>
+        <textarea id="remarks" placeholder="Any additional notes..."></textarea>
+      </div>
+
+      <div class="field">
+        <label>Surveyor Name <span class="req">*</span></label>
+        <input type="text" id="surveyor" placeholder="Your full name" required>
+      </div>
+    </div>
+
+    <button class="submit-btn" onclick="submitForm()">
+      Submit Survey Data →
+    </button>
+
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════
+//  ⚙️ CONFIGURATION
+// ════════════════════════════════════
+// Paste your Google Apps Script Web App URL here after deploying
+var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4L36knTY8LVyn-0DpIbHx5tkU-fZ32tnEL0otQWAzC7kLSsEkakvmF6l4zrxC2kP6/exec";
+// ════════════════════════════════════
+
+var capturedLat = null;
+var capturedLng = null;
+
+// ── GPS Capture ──
+function getLocation() {
+  var btn    = document.getElementById("gps-btn");
+  var status = document.getElementById("gps-status");
+
+  if (!navigator.geolocation) {
+    status.className = "gps-status error";
+    status.textContent = "❌ GPS not supported on this device.";
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "⏳ Getting location...";
+  status.className = "gps-status loading";
+  status.textContent = "📡 Accessing GPS — please wait...";
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      capturedLat = pos.coords.latitude.toFixed(6);
+      capturedLng = pos.coords.longitude.toFixed(6);
+      var acc = Math.round(pos.coords.accuracy);
+
+      document.getElementById("lat").value = capturedLat;
+      document.getElementById("lng").value = capturedLng;
+
+      status.className = "gps-status success";
+      status.textContent = "✅ Location captured! Accuracy: ±" + acc + " meters";
+
+      var link = document.getElementById("maps-link");
+      link.href = "https://maps.google.com/?q=" + capturedLat + "," + capturedLng;
+      link.style.display = "block";
+
+      btn.textContent = "🔄 Recapture Location";
+      btn.disabled = false;
+    },
+    function(err) {
+      var msg = {
+        1: "Location permission denied. Please allow location access in browser settings.",
+        2: "GPS signal unavailable. Try outdoors.",
+        3: "GPS timed out. Please try again."
+      };
+      status.className = "gps-status error";
+      status.textContent = "❌ " + (msg[err.code] || "Unknown error.");
+      btn.textContent = "📡 Retry Location";
+      btn.disabled = false;
+    },
+    { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+  );
+}
+
+// ── Photo Preview ──
+function previewPhoto(input) {
+  var preview = document.getElementById("photo-preview");
+  if (input.files && input.files[0]) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = "block";
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+
+// ── Validate ──
+function validate() {
+  var errors = [];
+  if (!document.getElementById("ward").value)     errors.push("Ward Number");
+  if (!document.getElementById("street").value)   errors.push("Street Name");
+  if (!capturedLat)                                errors.push("GPS Location (tap Capture button)");
+  if (!document.querySelector('input[name="pole"]:checked'))      errors.push("Pole Type");
+  if (!document.querySelector('input[name="ownership"]:checked')) errors.push("Ownership");
+  if (!document.querySelector('input[name="lamp"]:checked'))      errors.push("Lamp Type");
+  if (!document.getElementById("wattage").value)  errors.push("Wattage");
+  if (!document.querySelector('input[name="status"]:checked'))    errors.push("Operational Status");
+  if (!document.getElementById("surveyor").value) errors.push("Surveyor Name");
+  return errors;
+}
+
+// ── Submit ──
+function submitForm() {
+  var errors = validate();
+  if (errors.length > 0) {
+    alert("Please fill these required fields:\n\n• " + errors.join("\n• "));
+    return;
+  }
+
+  document.getElementById("submitting").style.display = "flex";
+
+  var data = {
+    timestamp:  new Date().toISOString(),
+    ward:       document.getElementById("ward").value,
+    street:     document.getElementById("street").value,
+    assess:     document.getElementById("assess").value,
+    lat:        capturedLat,
+    lng:        capturedLng,
+    pole:       getRadio("pole"),
+    ownership:  getRadio("ownership"),
+    lamp:       getRadio("lamp"),
+    wattage:    document.getElementById("wattage").value,
+    control:    getRadio("control"),
+    power:      getRadio("power"),
+    meter:      document.getElementById("meter").value,
+    status:     getRadio("status"),
+    remarks:    document.getElementById("remarks").value,
+    surveyor:   document.getElementById("surveyor").value
+  };
+
+  fetch(APPS_SCRIPT_URL, {
+    method: "POST",
+    body: JSON.stringify(data)
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(res){
+    document.getElementById("submitting").style.display = "none";
+    document.getElementById("main-form").style.display  = "none";
+    document.getElementById("success-screen").style.display = "block";
+    document.getElementById("success-msg").textContent =
+      "Lamp Post ID: " + (res.lampId || "Auto-assigned") + " saved successfully!";
+  })
+  .catch(function(){
+    document.getElementById("submitting").style.display = "none";
+    alert("Submission failed. Please check your internet connection and try again.");
+  });
+}
+
+function getRadio(name) {
+  var el = document.querySelector('input[name="'+name+'"]:checked');
+  return el ? el.value : "";
+}
+
+function resetForm() {
+  document.getElementById("main-form").style.display   = "block";
+  document.getElementById("success-screen").style.display = "none";
+  document.getElementById("main-form").querySelectorAll("input[type=text], input[type=number], textarea, select").forEach(function(el){ el.value = ""; });
+  document.querySelectorAll("input[type=radio]").forEach(function(el){ el.checked = false; });
+  document.getElementById("photo-preview").style.display = "none";
+  document.getElementById("gps-status").className = "gps-status";
+  document.getElementById("maps-link").style.display = "none";
+  document.getElementById("gps-btn").textContent = "📡 Capture My Current Location";
+  document.getElementById("gps-btn").disabled = false;
+  capturedLat = null; capturedLng = null;
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>
