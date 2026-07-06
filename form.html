@@ -178,38 +178,7 @@
 
   <div id="main-form">
 
-    <!-- Section 1: Asset Identification -->
-    <div class="section-card">
-      <div class="section-title">📋 Asset Identification</div>
-
-      <div class="field">
-        <label>Ward Number <span class="req">*</span></label>
-        <select id="ward" required>
-          <option value="">Select Ward</option>
-          <option>Ward 1</option>
-          <option>Ward 2</option>
-          <option>Ward 3</option>
-          <option>Ward 4 — Nallur Irajathani</option>
-          <option>Ward 5</option>
-          <option>Ward 6</option>
-          <option>Ward 7</option>
-          <option>Ward 8</option>
-          <option>Ward 9</option>
-          <option>Ward 10</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Street Name <span class="req">*</span></label>
-        <input type="text" id="street" placeholder="e.g. Nallur Road" required>
-      </div>
-
-      <div class="field">
-        <label>Assessment Number</label>
-        <input type="text" id="assess" placeholder="e.g. A-1042 (if available)">
-      </div>
-    </div>
-
+    
     <!-- Section 2: GPS Location -->
     <div class="section-card">
       <div class="section-title">📍 GPS Location</div>
@@ -284,54 +253,6 @@
           <label><input type="radio" name="control" value="Switch"> Switch</label>
         </div>
       </div>
-
-      <div class="field">
-        <label>Power Supply</label>
-        <div class="radio-group">
-          <label><input type="radio" name="power" value="CEB"> CEB</label>
-          <label><input type="radio" name="power" value="JMC"> JMC</label>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Meter Number</label>
-        <input type="text" id="meter" placeholder="e.g. M-5042">
-      </div>
-    </div>
-
-    <!-- Section 4: Status -->
-    <div class="section-card">
-      <div class="section-title">🔆 Operational Status</div>
-      <div class="field">
-        <label>Current Status <span class="req">*</span></label>
-        <div class="radio-group">
-          <label class="status-working"><input type="radio" name="status" value="Working"> ✅ Working</label>
-          <label class="status-notwork"><input type="radio" name="status" value="Not Working"> ❌ Not Working</label>
-          <label class="status-maint"><input type="radio" name="status" value="Under Maintenance"> 🔧 Under Maintenance</label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 5: Documentation -->
-    <div class="section-card">
-      <div class="section-title">📸 Documentation</div>
-
-      <div class="field">
-        <label>Lamp Post Photo</label>
-        <input type="file" id="photo" accept="image/*" capture="environment" style="width:100%; padding:9px 12px; border:1px dashed var(--border); border-radius:var(--radius); font-size:14px; color:var(--muted); cursor:pointer; background:#FAFBFC;" onchange="previewPhoto(this)">
-        <img id="photo-preview" alt="Photo preview">
-      </div>
-
-      <div class="field">
-        <label>Remarks</label>
-        <textarea id="remarks" placeholder="Any additional notes..."></textarea>
-      </div>
-
-      <div class="field">
-        <label>Surveyor Name <span class="req">*</span></label>
-        <input type="text" id="surveyor" placeholder="Your full name" required>
-      </div>
-    </div>
 
     <button class="submit-btn" onclick="submitForm()">
       Submit Survey Data →
