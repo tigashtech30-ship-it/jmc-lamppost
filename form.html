@@ -17,7 +17,6 @@
     --muted:     #5A6A7E;
     --radius:    8px;
     --working:   #1E8449;
-    --notwork:   #C0392B;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
@@ -53,18 +52,6 @@
   label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
   .req { color: #C0392B; margin-left: 2px; }
 
-  input[type=text], select, textarea {
-    width: 100%; padding: 9px 12px;
-    border: 1px solid var(--border); border-radius: var(--radius);
-    font-size: 14px; color: var(--text); background: var(--surface);
-    transition: border-color 0.15s;
-  }
-  input:focus, select:focus, textarea:focus {
-    outline: none; border-color: var(--blue-light);
-    box-shadow: 0 0 0 3px rgba(46,134,193,0.12);
-  }
-  textarea { resize: vertical; min-height: 70px; }
-
   .gps-box {
     background: #F0F7FF; border: 1px solid #B8D4F0;
     border-radius: var(--radius); padding: 12px;
@@ -89,7 +76,11 @@
   .gps-coords {
     display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;
   }
-  .gps-coords input { background: #E8F4FD; font-size: 13px; font-family: monospace; }
+  .gps-coords input {
+    width: 100%; padding: 9px 12px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    background: #E8F4FD; font-size: 13px; font-family: monospace; color: var(--text);
+  }
   .maps-link {
     display: none; margin-top: 8px; font-size: 12px;
     color: var(--blue-light); text-decoration: none; font-weight: 600;
@@ -101,7 +92,7 @@
   }
   .radio-group label {
     display: flex; align-items: center; gap: 6px;
-    padding: 6px 12px; border: 1px solid var(--border);
+    padding: 6px 14px; border: 1px solid var(--border);
     border-radius: 20px; cursor: pointer; font-size: 13px;
     color: var(--text); text-transform: none; letter-spacing: 0;
     font-weight: 400; transition: all 0.15s;
@@ -110,23 +101,13 @@
   .radio-group label:has(input:checked) {
     background: var(--blue-dark); color: #FFF; border-color: var(--blue-dark);
   }
-  .status-working:has(input:checked)  { background: #1E8449 !important; border-color: #1E8449 !important; }
-  .status-notwork:has(input:checked)  { background: #C0392B !important; border-color: #C0392B !important; }
-  .status-maint:has(input:checked)    { background: #D68910 !important; border-color: #D68910 !important; }
-
-  #photo-preview {
-    display: none; margin-top: 8px; border-radius: var(--radius);
-    max-height: 160px; width: 100%; object-fit: cover;
-    border: 1px solid var(--border);
-  }
 
   .submit-btn {
     width: 100%; padding: 14px;
     background: var(--gold); color: var(--blue-dark);
     border: none; border-radius: var(--radius);
     font-size: 16px; font-weight: 700; cursor: pointer;
-    letter-spacing: 0.3px; transition: background 0.15s;
-    margin-top: 0.5rem;
+    transition: background 0.15s; margin-top: 0.5rem;
   }
   .submit-btn:hover { background: #C49010; }
 
@@ -135,9 +116,9 @@
     background: var(--surface); border: 0.5px solid var(--border);
     border-radius: 10px; padding: 2.5rem 1.5rem; margin-bottom: 1rem;
   }
-  .success-icon { font-size: 48px; margin-bottom: 12px; }
+  .success-icon  { font-size: 48px; margin-bottom: 12px; }
   .success-title { font-size: 20px; font-weight: 700; color: var(--working); margin-bottom: 8px; }
-  .success-id { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
+  .success-id    { font-size: 14px; color: var(--muted); margin-bottom: 16px; }
   .btn-new {
     padding: 10px 24px; background: var(--blue-dark); color: #FFF;
     border: none; border-radius: var(--radius); font-size: 14px;
@@ -148,7 +129,11 @@
     background: rgba(12,45,90,0.7); z-index: 999;
     align-items: center; justify-content: center; flex-direction: column; color: #FFF;
   }
-  .spinner { width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.3); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px; }
+  .spinner {
+    width: 40px; height: 40px;
+    border: 3px solid rgba(255,255,255,0.3); border-top-color: var(--gold);
+    border-radius: 50%; animation: spin 0.8s linear infinite; margin-bottom: 12px;
+  }
   @keyframes spin { to { transform: rotate(360deg); } }
 </style>
 </head>
@@ -162,24 +147,25 @@
   </div>
 </header>
 
-<div id="submitting" style="display:none; position:fixed; inset:0; background:rgba(12,45,90,0.7); z-index:999; align-items:center; justify-content:center; flex-direction:column; color:#FFF;">
+<div id="submitting">
   <div class="spinner"></div>
   <div style="font-size:15px; font-weight:600;">Submitting data...</div>
 </div>
 
 <div class="form-wrap">
 
+  <!-- Success Screen -->
   <div id="success-screen">
     <div class="success-icon">✅</div>
     <div class="success-title">Successfully Submitted!</div>
-    <div class="success-id" id="success-msg">Data has been saved to JMC database.</div>
+    <div class="success-id" id="success-msg">Data saved to JMC database.</div>
     <button class="btn-new" onclick="resetForm()">Add Another Lamp Post</button>
   </div>
 
+  <!-- Main Form -->
   <div id="main-form">
 
-    
-    <!-- Section 2: GPS Location -->
+    <!-- GPS Location -->
     <div class="section-card">
       <div class="section-title">📍 GPS Location</div>
       <div class="gps-box">
@@ -201,7 +187,7 @@
       </div>
     </div>
 
-    <!-- Section 3: Physical Attributes -->
+    <!-- Physical Attributes -->
     <div class="section-card">
       <div class="section-title">🔩 Physical Attributes</div>
 
@@ -234,25 +220,14 @@
       </div>
 
       <div class="field">
-        <label>Wattage <span class="req">*</span></label>
-        <div class="radio-group">
-          <label><input type="radio" name="wattage" value="30W"> 30W</label>
-          <label><input type="radio" name="wattage" value="40W"> 40W</label>
-          <label><input type="radio" name="wattage" value="50W"> 50W</label>
-          <label><input type="radio" name="wattage" value="100W"> 100W</label>
-          <label><input type="radio" name="wattage" value="150W"> 150W</label>
-          <label><input type="radio" name="wattage" value="Other"> Other</label>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Control Box</label>
+        <label>Control Box <span class="req">*</span></label>
         <div class="radio-group">
           <label><input type="radio" name="control" value="Photocell"> Photocell</label>
           <label><input type="radio" name="control" value="Breaker"> Breaker</label>
           <label><input type="radio" name="control" value="Switch"> Switch</label>
         </div>
       </div>
+    </div>
 
     <button class="submit-btn" onclick="submitForm()">
       Submit Survey Data →
@@ -309,29 +284,13 @@ function getLocation() {
   );
 }
 
-function previewPhoto(input) {
-  var preview = document.getElementById("photo-preview");
-  if (input.files && input.files[0]) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      preview.src = e.target.result;
-      preview.style.display = "block";
-    };
-    reader.readAsDataURL(input.files[0]);
-  }
-}
-
 function validate() {
   var errors = [];
-  if (!document.getElementById("ward").value)    errors.push("Ward Number");
-  if (!document.getElementById("street").value)  errors.push("Street Name");
-  if (!capturedLat)                               errors.push("GPS Location (tap Capture button)");
+  if (!capturedLat)                                               errors.push("GPS Location (tap Capture button)");
   if (!document.querySelector('input[name="pole"]:checked'))      errors.push("Pole Type");
   if (!document.querySelector('input[name="ownership"]:checked')) errors.push("Ownership");
   if (!document.querySelector('input[name="lamp_type"]:checked')) errors.push("Lamp Type");
-  if (!document.querySelector('input[name="wattage"]:checked'))   errors.push("Wattage");
-  if (!document.querySelector('input[name="status"]:checked'))    errors.push("Operational Status");
-  if (!document.getElementById("surveyor").value) errors.push("Surveyor Name");
+  if (!document.querySelector('input[name="control"]:checked'))   errors.push("Control Box");
   return errors;
 }
 
@@ -342,23 +301,17 @@ function submitForm() {
     return;
   }
   document.getElementById("submitting").style.display = "flex";
+  var now = new Date().toISOString();
+  var mapsUrl = "https://maps.google.com/?q=" + capturedLat + "," + capturedLng;
   var data = {
-    timestamp: new Date().toISOString(),
-    ward:      document.getElementById("ward").value,
-    street:    document.getElementById("street").value,
-    assess:    document.getElementById("assess").value,
+    timestamp: now,
     lat:       capturedLat,
     lng:       capturedLng,
     pole:      getRadio("pole"),
     ownership: getRadio("ownership"),
     lamp:      getRadio("lamp_type"),
-    wattage:   getRadio("wattage"),
     control:   getRadio("control"),
-    power:     getRadio("power"),
-    meter:     document.getElementById("meter").value,
-    status:    getRadio("status"),
-    remarks:   document.getElementById("remarks").value,
-    surveyor:  document.getElementById("surveyor").value
+    mapslink:  mapsUrl
   };
   fetch(APPS_SCRIPT_URL, {
     method: "POST",
@@ -386,13 +339,13 @@ function getRadio(name) {
 function resetForm() {
   document.getElementById("main-form").style.display = "block";
   document.getElementById("success-screen").style.display = "none";
-  document.getElementById("main-form").querySelectorAll("input[type=text], select, textarea").forEach(function(el){ el.value = ""; });
   document.querySelectorAll("input[type=radio]").forEach(function(el){ el.checked = false; });
-  document.getElementById("photo-preview").style.display = "none";
   document.getElementById("gps-status").className = "gps-status";
   document.getElementById("maps-link").style.display = "none";
   document.getElementById("gps-btn").textContent = "📡 Capture My Current Location";
   document.getElementById("gps-btn").disabled = false;
+  document.getElementById("lat").value = "";
+  document.getElementById("lng").value = "";
   capturedLat = null; capturedLng = null;
   window.scrollTo(0,0);
 }
